@@ -1,0 +1,33 @@
+{
+  "name": "motion-product",
+  "version": "2.0.1",
+  "description": "Skill do Claude Code para criar filmes publicitários de produto digital com a interface em 3D.",
+  "type": "module",
+  "bin": {
+    "motion-product": "bin/instalar.mjs"
+  },
+  "files": [
+    "bin",
+    "SKILL.md",
+    "modelos",
+    "referencias",
+    "ferramentas",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luizfelipe-pacifico/motion-product.git"
+  },
+  "keywords": [
+    "claude-code",
+    "skill",
+    "motion-graphics",
+    "video"
+  ],
+  "license": "MIT"
+}

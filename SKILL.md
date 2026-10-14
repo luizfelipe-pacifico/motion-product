@@ -3,7 +3,7 @@ name: motion-product
 description: Cria filmes publicitários de produto digital (MP4 com trilha sintetizada) a partir da ideia e do código ou das telas do produto, com a interface reconstruída fielmente em código e animada em 3D, na marca de quem pede. Use quando pedirem motion, vídeo de lançamento ou de demonstração de um produto digital (SaaS, app, sistema, plataforma), com ou sem referência. Para vinheta, abertura de evento ou motion sem interface, prefira a skill motion-graphics.
 ---
 
-# Motion de produto (v2.0)
+# Motion de produto (v2.0.1)
 
 Da ideia ao MP4 sem fotos, vídeos ou prints. Cada tela e cada card do produto são **reconstruídos em código**, na paleta e na tipografia da marca, e o filme é uma função pura do tempo. A v2 nasceu de mais de dez filmes completos feitos para um mesmo produto SaaS; o porquê de cada regra está em `referencias/licoes.md`.
 
