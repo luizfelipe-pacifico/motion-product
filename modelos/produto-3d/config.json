@@ -1,0 +1,26 @@
+{
+  "w": 1920,
+  "h": 1080,
+  "dur": 30,
+  "fps": 60,
+  "bpm": 120,
+  "saida": "filme.mp4",
+  "marca": {
+    "nome": "Marca",
+    "fundo": "#0F172A",
+    "fundoProfundo": "#020617",
+    "superficie": "#1E293B",
+    "elevado": "#334155",
+    "borda": "#334155",
+    "texto": "#F8FAFC",
+    "apoio": "#94A3B8",
+    "acento": "#22C55E",
+    "tintaAcento": "#052E16",
+    "acentoProfundo": "#14532D",
+    "display": "system-ui",
+    "ui": "system-ui",
+    "fontes": [],
+    "logo": null,
+    "simbolo": null
+  }
+}

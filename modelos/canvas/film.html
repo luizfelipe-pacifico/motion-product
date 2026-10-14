@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Filme</title>
+<script>
+  // Contrato: o filme é função pura do tempo; window.seek(t) pinta o quadro t.
+  // Sem transições CSS, sem setTimeout, sem requestAnimationFrame no modo render, sem estado entre quadros.
+  // Ruído só por mulberry32 com semente. Tudo é desenhado em código: nada de foto, vídeo ou print.
+  // O render injeta window.CONFIG e window.BEATS; na prévia (servida por http) lê config.json.
+  if (!window.CONFIG) { const x = new XMLHttpRequest(); x.open('GET', 'config.json', false); x.send(); window.CONFIG = JSON.parse(x.responseText); }
+  document.write('<style>' + ((window.CONFIG.marca || {}).fontes || []).map(ft => `@font-face { font-family: '${ft.familia}'; font-weight: ${ft.peso || '100 900'}; font-display: block; src: url('${ft.arquivo}'); }`).join('\n') + '</style>');
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { overflow: hidden; background: #000; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// ---------- configuração ----------
+const CONFIG = window.CONFIG;
+const W = CONFIG.w, H = CONFIG.h, DUR = CONFIG.dur, M = CONFIG.marca || {};
+const BEAT = 60 / (CONFIG.bpm || 120);
+const BEATS = (window.BEATS && window.BEATS.length) ? window.BEATS : Array.from({ length: Math.ceil(DUR / BEAT) }, (_, k) => k * BEAT);
+const b = k => BEATS[Math.floor(k)] + (k % 1) * BEAT;             // tempo da batida k (aceita frações)
+const U = Math.min(W, H) / 1080;                                    // unidade: escala tudo pelo lado menor (16:9, 9:16 e 1:1)
+const cv = document.getElementById('c'); cv.width = W; cv.height = H;
+const ctx = cv.getContext('2d');
+
+// ---------- utilitários ----------
+const clamp = (v, a = 0, z = 1) => Math.max(a, Math.min(z, v));
+const lerp = (a, z, u) => a + (z - a) * u;
+const seg = (t, a, z) => clamp((t - a) / (z - a));                  // progresso 0..1 de t entre a e z
+const ease = {
+  out: u => 1 - (1 - u) ** 3, inOut: u => u < .5 ? 4 * u ** 3 : 1 - (-2 * u + 2) ** 3 / 2, in: u => u ** 3,
+  expoOut: u => u === 1 ? 1 : 1 - 2 ** (-10 * u), expoInOut: u => u === 0 ? 0 : u === 1 ? 1 : u < .5 ? 2 ** (20 * u - 10) / 2 : (2 - 2 ** (-20 * u + 10)) / 2,
+  back: u => { const c = 1.6; return 1 + (c + 1) * (u - 1) ** 3 + c * (u - 1) ** 2; },
+  spring: u => 1 - Math.exp(-6 * u) * Math.cos(10 * u),             // pousa com um quique leve
+};
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+// Grão: ruído semeado em meia resolução, composição normal (nunca mix-blend-mode). Desligado por padrão.
+const grainCv = document.createElement('canvas'); grainCv.width = W / 2; grainCv.height = H / 2;
+const gctx = grainCv.getContext('2d'), gimg = gctx.createImageData(W / 2, H / 2);
+function grain(t, amount = 10) {
+  const r = mulberry32(1 + Math.floor(t * 30)), p = gimg.data;
+  for (let i = 0; i < p.length; i += 4) { const v = (r() - .5) * 2; p[i] = p[i + 1] = p[i + 2] = v > 0 ? 255 : 0; p[i + 3] = Math.abs(v) * amount; }
+  gctx.putImageData(gimg, 0, 0); ctx.imageSmoothingEnabled = false; ctx.drawImage(grainCv, 0, 0, W, H); ctx.imageSmoothingEnabled = true;
+}
+</script>
+<script src="pecas.js"></script>
+<script src="cenas.js"></script>
+<script>
+window.seek = t => {
+  t = clamp(t, 0, DUR - 1e-4); novoQuadro();
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.filter = 'none'; ctx.clearRect(0, 0, W, H);
+  for (const s of SCENES) if (t >= s.a && t < s.z) { ctx.save(); s.draw(t); ctx.restore(); }
+  if (CONFIG.grao) grain(t, CONFIG.grao);
+  const fim = seg(t, DUR - 0.5, DUR); if (fim > 0) { ctx.fillStyle = rgba(T.bgDeep, fim); ctx.fillRect(0, 0, W, H); }
+};
+// Fontes e logotipo carregados antes de declarar pronto.
+Promise.all([carregarLogo(), ...[400, 500, 600, 700, 800].map(w => document.fonts.load(`${w} 64px ${FONT_DISPLAY}`))]).then(() => document.fonts.ready).then(() => {
+  seek(0);
+  window.ready = { w: W, h: H, dur: DUR, cenas: SCENES.length, canvas: true };
+  if (!location.search.includes('render')) { const t0 = performance.now(); const loop = () => { seek(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+});
+</script>
+</body>
+</html>

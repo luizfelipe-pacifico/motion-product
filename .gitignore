@@ -1,0 +1,8 @@
+node_modules/
+teste/
+resultados/
+rodadas/
+audio/
+beats.json
+*.parcial
+*.mp4

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Filme</title>
+<script>
+  // Contrato: window.seek(t) monta o quadro t; nada de transição CSS, setTimeout ou estado entre quadros.
+  // Câmera 3D por perspectiva CSS; cada tela do produto é uma textura em canvas desenhada pelo kit (telas.js),
+  // reconstruída a partir do código do produto. O render injeta window.CONFIG; na prévia lê config.json.
+  if (!window.CONFIG) { const x = new XMLHttpRequest(); x.open('GET', 'config.json', false); x.send(); window.CONFIG = JSON.parse(x.responseText); }
+  (() => {
+    const c = window.CONFIG, m = c.marca || {}, css = (m.fontes || []).map(ft => `@font-face { font-family: '${ft.familia}'; font-weight: ${ft.peso || '100 900'}; font-display: block; src: url('${ft.arquivo}'); ${ft.unicodeRange ? 'unicode-range: ' + ft.unicodeRange + ';' : ''} }`).join('\n');
+    document.write(`<style>${css}
+      html, body { width: ${c.w}px; height: ${c.h}px; }
+      #stage, #bg, #fx { width: ${c.w}px; height: ${c.h}px; }
+      #world { left: ${c.w / 2}px; top: ${c.h / 2}px; }
+      body { background: ${m.fundoProfundo || m.fundo || '#020617'}; font-family: '${m.display || 'system-ui'}', system-ui, sans-serif; }
+    </style>`);
+  })();
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { overflow: hidden; }
+  #stage { position: absolute; left: 0; top: 0; overflow: hidden; perspective: 1400px; perspective-origin: 50% 50%; }
+  #bg, #fx { position: absolute; left: 0; top: 0; }
+  #world { position: absolute; width: 0; height: 0; transform-style: preserve-3d; }
+  .pl { position: absolute; transform-style: preserve-3d; }
+  .pl > canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; backface-visibility: hidden; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="bg"></canvas><div id="world"></div><canvas id="fx"></canvas></div>
+<script>
+const CONFIG = window.CONFIG;
+const W = CONFIG.w, H = CONFIG.h, DUR = CONFIG.dur;
+for (const id of ['bg', 'fx']) { const cv = document.getElementById(id); cv.width = W; cv.height = H; }
+const clamp = (v, a = 0, z = 1) => Math.max(a, Math.min(z, v));
+const lerp = (a, z, u) => a + (z - a) * u;
+const seg = (t, a, z) => clamp((t - a) / (z - a));
+const b = k => k * 60 / (CONFIG.bpm || 120);
+const ease = {
+  out: u => 1 - (1 - u) ** 3, inOut: u => u < .5 ? 4 * u ** 3 : 1 - (-2 * u + 2) ** 3 / 2, in: u => u ** 3,
+  expoOut: u => u === 1 ? 1 : 1 - 2 ** (-10 * u), expoInOut: u => u === 0 ? 0 : u === 1 ? 1 : u < .5 ? 2 ** (20 * u - 10) / 2 : (2 - 2 ** (-20 * u + 10)) / 2,
+  spring: u => 1 - Math.exp(-6 * u) * Math.cos(10 * u), back: u => { const k = 1.7; return 1 + (k + 1) * (u - 1) ** 3 + k * (u - 1) ** 2; },
+};
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+</script>
+<script src="icones.js"></script>
+<script src="kit.js"></script>
+<script src="telas.js"></script>
+<script src="motor.js"></script>
+<script src="cenas.js"></script>
+</body>
+</html>
