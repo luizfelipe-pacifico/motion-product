@@ -1,5 +1,8 @@
 # Histórico
 
+## v2.0.1 (14/10/2026)
+- Instalação em um comando: `npx github:luizfelipe-pacifico/motion-product` (com `--projeto` para instalar só no projeto atual; rodar de novo atualiza).
+
 ## v2.0 (14/10/2026): motion-product
 Nova skill, irmã da `motion-graphics`, a partir de mais de dez filmes completos para um mesmo produto SaaS.
 

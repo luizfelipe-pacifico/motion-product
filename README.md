@@ -5,16 +5,16 @@ Skill para Claude Code que cria **filmes publicitários de produto digital** (Sa
 Para motion sem interface (vinheta, abertura de evento, explicativo), veja a skill irmã [motion-graphics](https://github.com/luizfelipe-pacifico/motion-graphics).
 
 ## Instalação
-Clone esta pasta para a pasta de skills do Claude Code:
-
 ```bash
-# para todos os projetos
-git clone https://github.com/luizfelipe-pacifico/motion-product.git ~/.claude/skills/motion-product
-# ou só para um projeto
-git clone https://github.com/luizfelipe-pacifico/motion-product.git <projeto>/.claude/skills/motion-product
+npx github:luizfelipe-pacifico/motion-product
 ```
+Pronto: a skill fica disponível no Claude Code em todos os projetos. Abra (ou reinicie) o Claude Code e peça o vídeo.
 
-Requisitos: Node 22 ou mais novo, Chrome ou Edge, e ffmpeg com libx264 (`node render.mjs --check` encontra e guarda em cache).
+- **Só em um projeto:** rode na pasta do projeto `npx github:luizfelipe-pacifico/motion-product --projeto`
+- **Atualizar:** rode o mesmo comando de novo.
+- **Remover:** apague a pasta `~/.claude/skills/motion-product` (ou `.claude/skills/motion-product` no projeto).
+
+Precisa de Node 22 ou mais novo, Chrome ou Edge e ffmpeg com libx264. A skill confere tudo sozinha antes do primeiro vídeo.
 
 ## Uso
 Peça ao Claude Code um vídeo do produto ("faça um motion de lançamento do nosso sistema"). A skill pergunta só o que faltar: o que é o produto, o que ele faz e para quem, o que promete, se o filme é demonstrativo ou publicitário, formato e duração, e o design system e onde estão as telas (código, site, documento de marca, fonte e logo). Depois monta o roteiro no arco publicitário, reconstrói as telas com dados fictícios, revisa com folhas de contato e checagens automáticas, e renderiza uma vez.
@@ -22,6 +22,7 @@ Peça ao Claude Code um vídeo do produto ("faça um motion de lançamento do no
 ## Estrutura
 ```
 SKILL.md                         instruções que o Claude segue
+bin/instalar.mjs                 instalador usado pelo npx (package.json aponta para ele)
 modelos/
   comum/render.mjs               render: Chrome headless + ffmpeg; --sheet, --marcos, --colisao, --stills, --draft
   comum/audio.mjs                trilha sintetizada; sons por evento do filme de produto; edite só o ARRANJO
